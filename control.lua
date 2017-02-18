@@ -3,8 +3,14 @@
 -- Change this if you want the mod to take more belts for the same distance, for balancing
 local BELT_COST_MULTIPLIER = 1 --(DEFAULT (integer, cannot be floating point): 1)
 
+-- Change this if you want the mod to take more pipe for the same distance, for balancing
+local PIPE_COST_MULTIPLIER = 1 --(DEFAULT (integer, cannot be floating point): 1)
+
 -- Change this to false if you'd like to not get the belts back when you break the pair of belts.
 local SHOULD_REFUND_BELTS = true -- (DEFAULT (boolean): true)
+
+-- Change this to false if pipes should not be refunded.
+local SHOULD_REFUND_PIPES = true -- (DEFAULT (boolean): true)
 
 -- Change this if you'd like to change what percentage of belts get returned when breaking the pair of belts. 0 means no belts, 0.5 means 50% of belts used, 2 for twice the amount used, etc. Overridden if SHOULD_REFUND_BELTS is false.
 local BELT_REFUND_MULTIPLIER = 1.0 -- (DEFAULT (floating point): 1.0)
@@ -80,8 +86,34 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
             end
          end
       elseif entity.name=='subterrainian-pipe' then
-         --todo same as above
-      end
+         local player=game.players[e.player_index]
+         --get neighbor of pipe and figure out distance
+         local inputEntity = entity.neighbours[2] --the opening end of the pair of pipes
+         if not inputEntity then --this will be nil if we're building the first pipe
+            return nil
+         end
+         local IX = inputEntity.position.x
+         local IY = inputEntity.position.y
+         local OX = entity.position.x
+         local OY = entity.position.y
+         --distance formula to find out distance
+         local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
+
+         if player.get_item_count("pipe") < (distance * PIPE_COST_MULTIPLIER) then --if they don't have enough
+            entity.destroy() -- Destroy the entity
+            player.print("Not enough pipes in inventory to create this length.")
+
+            --give their items back
+            if not player.cursor_stack.valid_for_read then --if that was their last one
+               player.cursor_stack.set_stack{name="subterrainian-pipe", count=1}
+            elseif player.cursor_stack.name == "subterrainian-pipe" then
+               player.cursor_stack.count = player.cursor_stack.count + 1
+            end
+         else --they have enough
+            player.remove_item{name="pipe",count=distance * PIPE_COST_MULTIPLIER} --deduct the required belts from their inventory
+         end
+
+      end --ends the pipe code
    end --ends the function in the event
 )
 

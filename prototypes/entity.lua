@@ -7,7 +7,7 @@ data:extend({
     minable = {hardness = 0.2, mining_time = 0.5, result = "underground-belt"},
     max_health = 100,
     corpse = "small-remnants",
-    max_distance = 20,
+    max_distance = 250,
     underground_sprite =
     {
       filename = "__core__/graphics/arrows/underground-lines.png",
@@ -72,6 +72,7 @@ data:extend({
     flags = {"placeable-neutral", "player-creation"},
     minable = {hardness = 0.2, mining_time = 0.5, result = "fast-subterrainian-belt"},
     max_health = 150,
+    max_distance = 250,
     corpse = "small-remnants",
     underground_sprite =
     {
@@ -137,6 +138,7 @@ data:extend({
     flags = {"placeable-neutral", "player-creation"},
     minable = {hardness = 0.2, mining_time = 0.5, result = "express-underground-belt"},
     max_health = 200,
+    max_distance = 250,
     corpse = "small-remnants",
     underground_sprite =
     {

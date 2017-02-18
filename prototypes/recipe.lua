@@ -39,5 +39,18 @@ data:extend({
     },
     result_count = 2,
     result = "express-subterrainian-belt"
+  },
+  {
+    type = "recipe",
+    name = "subterrainian-pipe",
+    enabled = true,
+    ingredients =
+    {
+      {"pipe", 10},
+      {"iron-plate", 5}
+    },
+    result_count = 2,
+    result = "subterrainian-pipe",
+    requester_paste_multiplier = 4
   }
 })

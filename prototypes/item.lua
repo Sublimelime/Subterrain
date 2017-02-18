@@ -28,5 +28,15 @@ data:extend({
     order = "b[underground-belt]-c[express-underground-belt]",
     place_result = "express-subterrainian-belt",
     stack_size = 50
+  },
+ {
+    type = "item",
+    name = "subterrainian-pipe",
+    icon = "__base__/graphics/icons/pipe-to-ground.png",
+    flags = {"goes-to-quickbar"},
+    subgroup = "energy-pipe-distribution",
+    order = "a[pipe]-b[pipe-to-ground]",
+    place_result = "subterrainian-pipe",
+    stack_size = 50
   }
 })

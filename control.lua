@@ -13,7 +13,10 @@ local SHOULD_REFUND_BELTS = true -- (DEFAULT (boolean): true)
 local SHOULD_REFUND_PIPES = true -- (DEFAULT (boolean): true)
 
 -- Change this if you'd like to change what percentage of belts get returned when breaking the pair of belts. 0 means no belts, 0.5 means 50% of belts used, 2 for twice the amount used, etc. Overridden if SHOULD_REFUND_BELTS is false.
-local BELT_REFUND_MULTIPLIER = 1.0 -- (DEFAULT (floating point): 1.0)
+local BELT_REFUND_MULTIPLIER = 1.0 --(DEFAULT (floating point): 1.0)
+
+-- Change this if you'd like to change what percentage of pipes get returned when breaking the pair of pipe to grounds. For valid numbers, see field above
+local PIPE_REFUND_MULTIPLIER = 1.0 --(DEFAULT (floating point): 1.0)
 
 -----------------------------
 
@@ -119,14 +122,14 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
 
 script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mined item is removed from the map
    function(e)
-      if not SHOULD_REFUND_BELTS or BELT_REFUND_MULTIPLIER <= 0 then --don't do any of this if not refunding belts
-         return nil
-      end
 
       local entity=e.entity
 
       --first check to see if it's my belt or pipe being removed
       if entity.name=='subterrainian-belt' or entity.name=='fast-subterrainian-belt' or entity.name=='express-subterrainian-belt' then
+         if not SHOULD_REFUND_BELTS or BELT_REFUND_MULTIPLIER <= 0 then --don't do any of this if not refunding belts
+            return nil
+         end
 
          if entity.belt_to_ground_type == 'output' then --If they're breaking the ending piece
             local player=game.players[e.player_index]
@@ -199,7 +202,35 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
          end
 
       elseif entity.name=='subterrainian-pipe' then
-         --todo same as above
+         if not SHOULD_REFUND_PIPES or PIPE_REFUND_MULTIPLIER <= 0 then --don't do any of this if not refunding pipes
+            return nil
+         end
+
+         local player=game.players[e.player_index]
+         --get neighbor of belt and figure out distance
+         local inputEntity = entity.neighbours[2] or entity --the opening end of the pair of pipes or itself
+         local IX = inputEntity.position.x
+         local IY = inputEntity.position.y
+         local OX = entity.position.x
+         local OY = entity.position.y
+         --distance formula to find out distance
+         local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
+
+         if distance == 0 then --it has no pair, aka itself
+            return nil
+         end
+         --find and place a chest full of the pipes to refund
+         local chestPosition = game.surfaces[1].find_non_colliding_position("wooden-chest", player.position, 0, 1.5)
+         local chestEntity = nil
+         if chestPosition then --if found a position for the chest
+            chestEntity = game.surfaces[1].create_entity({name="wooden-chest",position=chestPosition,force="neutral"})
+         end
+
+         if chestEntity then
+            --fill the chest with pipes
+            chestEntity.insert{name="pipe",count=math.floor((distance * PIPE_COST_MULTIPLIER) * PIPE_REFUND_MULTIPLIER)}
+         end
       end
+
    end
 )

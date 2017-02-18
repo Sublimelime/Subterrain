@@ -26,7 +26,7 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
       local entity=e.created_entity
 
       --first check to see if it's my belt or pipe being built
-      if entity.name=='subterrainian-belt' or entity.name=='fast-subterrainian-belt' or entity.name=='express-subterrainian-belt' then
+      if entity.name=='subterranean-belt' or entity.name=='fast-subterranean-belt' or entity.name=='express-subterranean-belt' then
          if entity.belt_to_ground_type == 'output' then --If they're building the ending piece
             local player=game.players[e.player_index]
             --get neighbor of belt and figure out distance
@@ -40,15 +40,15 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
 
             --check if they have the correct amount of the respective belt in their inventory
             ------------------------NORMAL BELT
-            if entity.name=='subterrainian-belt' then
+            if entity.name=='subterranean-belt' then
                if player.get_item_count("transport-belt") < (distance * BELT_COST_MULTIPLIER) then --if they don't have enough
                   entity.destroy() -- Destroy the entity
                   player.print("Not enough transport belts in inventory to create this length.")
 
                   --give their items back
                   if not player.cursor_stack.valid_for_read then --if that was their last one
-                     player.cursor_stack.set_stack{name="subterrainian-belt", count=1}
-                  elseif player.cursor_stack.name == "subterrainian-belt" then
+                     player.cursor_stack.set_stack{name="subterranean-belt", count=1}
+                  elseif player.cursor_stack.name == "subterranean-belt" then
                      player.cursor_stack.count = player.cursor_stack.count + 1
                   end
                else --they have enough
@@ -56,15 +56,15 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
                end
 
                ---------------------FAST BELT
-            elseif entity.name == 'fast-subterrainian-belt' then
+            elseif entity.name == 'fast-subterranean-belt' then
                if player.get_item_count("fast-transport-belt") < (distance * BELT_COST_MULTIPLIER) then --if they don't have enough
                   entity.destroy() -- Destroy the entity
                   player.print("Not enough fast transport belts in inventory to create this length.")
 
                   --give their items back
                   if not player.cursor_stack.valid_for_read then --if that was their last one
-                     player.cursor_stack.set_stack{name="fast-subterrainian-belt", count=1}
-                  elseif player.cursor_stack.name == "fast-subterrainian-belt" then
+                     player.cursor_stack.set_stack{name="fast-subterranean-belt", count=1}
+                  elseif player.cursor_stack.name == "fast-subterranean-belt" then
                      player.cursor_stack.count = player.cursor_stack.count + 1
                   end
                else --they have enough
@@ -72,15 +72,15 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
                end
 
                ------------------EXPRESS BELT
-            elseif entity.name == 'express-subterrainian-belt' then
+            elseif entity.name == 'express-subterranean-belt' then
                if player.get_item_count("express-transport-belt") < (distance * BELT_COST_MULTIPLIER)then --if they don't have enough
                   entity.destroy() -- Destroy the entity
                   player.print("Not enough express transport belts in inventory to create this length.")
 
                   --give their items back
                   if not player.cursor_stack.valid_for_read then --if that was their last one
-                     player.cursor_stack.set_stack{name="express-subterrainian-belt", count=1}
-                  elseif player.cursor_stack.name == "express-subterrainian-belt" then
+                     player.cursor_stack.set_stack{name="express-subterranean-belt", count=1}
+                  elseif player.cursor_stack.name == "express-subterranean-belt" then
                      player.cursor_stack.count = player.cursor_stack.count + 1
                   end
                else --they have enough
@@ -88,7 +88,7 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
                end
             end
          end
-      elseif entity.name=='subterrainian-pipe' then
+      elseif entity.name=='subterranean-pipe' then
          local player=game.players[e.player_index]
          --get neighbor of pipe and figure out distance
          local inputEntity = entity.neighbours[2] --the opening end of the pair of pipes
@@ -108,8 +108,8 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
 
             --give their items back
             if not player.cursor_stack.valid_for_read then --if that was their last one
-               player.cursor_stack.set_stack{name="subterrainian-pipe", count=1}
-            elseif player.cursor_stack.name == "subterrainian-pipe" then
+               player.cursor_stack.set_stack{name="subterranean-pipe", count=1}
+            elseif player.cursor_stack.name == "subterranean-pipe" then
                player.cursor_stack.count = player.cursor_stack.count + 1
             end
          else --they have enough
@@ -126,7 +126,7 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
       local entity=e.entity
 
       --first check to see if it's my belt or pipe being removed
-      if entity.name=='subterrainian-belt' or entity.name=='fast-subterrainian-belt' or entity.name=='express-subterrainian-belt' then
+      if entity.name=='subterranean-belt' or entity.name=='fast-subterranean-belt' or entity.name=='express-subterranean-belt' then
          if not SHOULD_REFUND_BELTS or BELT_REFUND_MULTIPLIER <= 0 then --don't do any of this if not refunding belts
             return nil
          end
@@ -155,11 +155,11 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
             if chestEntity then
 
                --fill the chest with belts corresponding to what the belt pair was made of
-               if entity.name == 'subterrainian-belt' then
+               if entity.name == 'subterranean-belt' then
                   chestEntity.insert{name="transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
-               elseif entity.name == 'fast-subterrainian-belt' then
+               elseif entity.name == 'fast-subterranean-belt' then
                   chestEntity.insert{name="fast-transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
-               elseif entity.name == 'express-subterrainian-belt' then
+               elseif entity.name == 'express-subterranean-belt' then
                   chestEntity.insert{name="express-transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
                end
             end
@@ -189,11 +189,11 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
 
             if chestEntity then
                --fill the chest with belts corresponding to what the belt pair was made of
-               if entity.name == 'subterrainian-belt' then
+               if entity.name == 'subterranean-belt' then
                   chestEntity.insert{name="transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
-               elseif entity.name == 'fast-subterrainian-belt' then
+               elseif entity.name == 'fast-subterranean-belt' then
                   chestEntity.insert{name="fast-transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
-               elseif entity.name == 'express-subterrainian-belt' then
+               elseif entity.name == 'express-subterranean-belt' then
                   chestEntity.insert{name="express-transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
                end
 
@@ -201,7 +201,7 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
 
          end
 
-      elseif entity.name=='subterrainian-pipe' then
+      elseif entity.name=='subterranean-pipe' then
          if not SHOULD_REFUND_PIPES or PIPE_REFUND_MULTIPLIER <= 0 then --don't do any of this if not refunding pipes
             return nil
          end

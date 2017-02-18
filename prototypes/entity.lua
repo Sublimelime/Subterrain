@@ -3,10 +3,10 @@
 data:extend({
       {
          type = "underground-belt",
-         name = "subterrainian-belt",
+         name = "subterranean-belt",
          icon = "__base__/graphics/icons/underground-belt.png",
          flags = {"placeable-neutral", "player-creation","not-blueprintable","not-deconstructable"},
-         minable = {hardness = 0.2, mining_time = 2, result = "subterrainian-belt"},
+         minable = {hardness = 0.2, mining_time = 2, result = "subterranean-belt"},
          max_health = 100,
          corpse = "small-remnants",
          max_distance = 250,
@@ -69,10 +69,10 @@ data:extend({
       },
       {
          type = "underground-belt",
-         name = "fast-subterrainian-belt",
+         name = "fast-subterranean-belt",
          icon = "__base__/graphics/icons/fast-underground-belt.png",
          flags = {"placeable-neutral", "player-creation","not-blueprintable","not-deconstructable"},
-         minable = {hardness = 0.2, mining_time = 2, result = "fast-subterrainian-belt"},
+         minable = {hardness = 0.2, mining_time = 2, result = "fast-subterranean-belt"},
          max_health = 150,
          max_distance = 250,
          corpse = "small-remnants",
@@ -135,10 +135,10 @@ data:extend({
       },
       {
          type = "underground-belt",
-         name = "express-subterrainian-belt",
+         name = "express-subterranean-belt",
          icon = "__base__/graphics/icons/express-underground-belt.png",
          flags = {"placeable-neutral", "player-creation","not-blueprintable","not-deconstructable"},
-         minable = {hardness = 0.2, mining_time = 2, result = "express-underground-belt"},
+         minable = {hardness = 0.2, mining_time = 2, result = "express-subterranean-belt"},
          max_health = 200,
          max_distance = 250,
          corpse = "small-remnants",
@@ -207,10 +207,10 @@ data:extend({
 
       {
          type = "pipe-to-ground",
-         name = "subterrainian-pipe",
+         name = "subterranean-pipe",
          icon = "__base__/graphics/icons/pipe-to-ground.png",
          flags = {"placeable-neutral", "player-creation","not-blueprintable","not-deconstructable"},
-         minable = {hardness = 0.2, mining_time= 2, result = "subterrainian-pipe"},
+         minable = {hardness = 0.2, mining_time= 2, result = "subterranean-pipe"},
          max_health = 100,
          max_distance = 250,
          corpse = "small-remnants",

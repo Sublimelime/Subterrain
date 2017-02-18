@@ -7,5 +7,5 @@
     "homepage": "https://github.com/TheRealGangsir/Subterrain",
     "factorio_version": "0.14",
     "dependencies": ["base >= 0.14"],
-    "description": "Adds an underground belt/pipe that can go much farther than standard underground belts/pipes, and charges the player a number of belts/pipes based on the distance between the entrance and exit belt/pipe."
+    "description": "Adds a few tiers of underground belt/pipe that can go much farther than standard underground belts/pipes, and charges the player a number of belts/pipes based on the distance between the entrance and exit belt/pipe."
 }

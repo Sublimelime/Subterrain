@@ -3,6 +3,6 @@ List of things to do for Subterrain
 * DONE Add longer pipes to mod
 * DONE Add locale translations
 * TODO Setup events on place to charge belts
-* TODO Add technologies to mod
+* DONE Add technologies to mod
 * TODO Change icons of belts and pipes added by mod
-* TODO Add anti-blueprint and decons. to items added by mod
+* DONE Add anti-blueprint and decons. to items added by mod

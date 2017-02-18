@@ -1,11 +1,16 @@
 -- USER CONFIG VARS ---------
 
 -- Change this if you want the mod to take more belts for the same distance, for balancing
-local BELT_COST_MULTIPLIER = 1 --(DEFAULT (integer): 1)
+local BELT_COST_MULTIPLIER = 1 --(DEFAULT (integer, cannot be floating point): 1)
+
 -- Change this to false if you'd like to not get the belts back when you break the pair of belts.
 local SHOULD_REFUND_BELTS = true -- (DEFAULT (boolean): true)
 
+-- Change this if you'd like to change what percentage of belts get returned when breaking the pair of belts. 0 means no belts, 0.5 means 50% of belts used, 2 for twice the amount used, etc. Overridden if SHOULD_REFUND_BELTS is false.
+local BELT_REFUND_MULTIPLIER = 1.0 -- (DEFAULT (floating point): 1.0)
+
 -----------------------------
+
 
 script.on_event({defines.events.on_built_entity}, --run whenever the player builds an entity
    function(e)
@@ -21,6 +26,7 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
             local IY = inputEntity.position.y
             local OX = entity.position.x
             local OY = entity.position.y
+            --distance formula to find out distance
             local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
 
             --check if they have the correct amount of the respective belt in their inventory
@@ -79,4 +85,89 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
    end --ends the function in the event
 )
 
---todo refund belts when broken
+script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mined item is removed from the map
+   function(e)
+      if not SHOULD_REFUND_BELTS or BELT_REFUND_MULTIPLIER <= 0 then --don't do any of this if not refunding belts
+         return nil
+      end
+
+      local entity=e.entity
+
+      --first check to see if it's my belt or pipe being removed
+      if entity.name=='subterrainian-belt' or entity.name=='fast-subterrainian-belt' or entity.name=='express-subterrainian-belt' then
+
+         if entity.belt_to_ground_type == 'output' then --If they're breaking the ending piece
+            local player=game.players[e.player_index]
+            --get neighbor of belt and figure out distance
+            local inputEntity = entity.neighbours[1] or entity --the opening end of the pair of belts or itself
+            local IX = inputEntity.position.x
+            local IY = inputEntity.position.y
+            local OX = entity.position.x
+            local OY = entity.position.y
+            --distance formula to find out distance
+            local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
+
+            if distance == 0 then
+               return nil
+            end
+            --find and place a chest full of the belts to refund
+            local chestPosition = game.surfaces[1].find_non_colliding_position("steel-chest", player.position, 0, 1.5)
+            local chestEntity = nil
+            if chestPosition then --if found a position for the chest
+               chestEntity = game.surfaces[1].create_entity({name="wooden-chest",position=chestPosition,force="neutral"})
+            end
+
+            if chestEntity then
+
+               --fill the chest with belts corresponding to what the belt pair was made of
+               if entity.name == 'subterrainian-belt' then
+                  chestEntity.insert{name="transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
+               elseif entity.name == 'fast-subterrainian-belt' then
+                  chestEntity.insert{name="fast-transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
+               elseif entity.name == 'express-subterrainian-belt' then
+                  chestEntity.insert{name="express-transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
+               end
+            end
+
+         elseif entity.belt_to_ground_type == 'input' then --they broke the input first
+            local player=game.players[e.player_index]
+            --get neighbor of belt and figure out distance
+            local outputEntity = entity.neighbours[1] or entity --the opening end of the pair of belts, or itself
+
+            local IX = outputEntity.position.x
+            local IY = outputEntity.position.y
+            local OX = entity.position.x
+            local OY = entity.position.y
+            --distance formula to find out distance
+            local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
+
+            if distance == 0 then --there's no other match for this belt, so refund has already been given/should not be
+               return nil
+            end
+
+            --find and place a chest full of the belts to refund
+            local chestPosition = game.surfaces[1].find_non_colliding_position("steel-chest", player.position, 0, 1.5)
+            local chestEntity = nil
+            if chestPosition then --if found a position for the chest
+               chestEntity = game.surfaces[1].create_entity({name="wooden-chest",position=chestPosition,force="neutral"})
+            end
+
+            if chestEntity then
+               --fill the chest with belts corresponding to what the belt pair was made of
+               if entity.name == 'subterrainian-belt' then
+                  chestEntity.insert{name="transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
+               elseif entity.name == 'fast-subterrainian-belt' then
+                  chestEntity.insert{name="fast-transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
+               elseif entity.name == 'express-subterrainian-belt' then
+                  chestEntity.insert{name="express-transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
+               end
+
+            end
+
+         end
+
+      elseif entity.name=='subterrainian-pipe' then
+         --todo same as above
+      end
+   end
+)

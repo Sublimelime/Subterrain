@@ -2,7 +2,13 @@ List of things to do for Subterrain
 
 * DONE Add longer pipes to mod
 * DONE Add locale translations
-* TODO Setup events on place to charge belts
+* DONE Setup events on place to charge belts
 * DONE Add technologies to mod
 * TODO Change icons of belts and pipes added by mod
 * DONE Add anti-blueprint and decons. to items added by mod
+* TODO Add belt refunding
+* DONE Add belt refunding modifier
+* TODO Fix refunding modifier to not make infinite belts
+* DONE Fix error when breaking input first
+
+* TODO Release the Mod!

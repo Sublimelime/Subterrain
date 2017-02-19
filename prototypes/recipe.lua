@@ -6,8 +6,9 @@ data:extend({
          energy_required = 1,
          ingredients =
             {
-               {"iron-plate", 10},
-               {"transport-belt", 5}
+               {"iron-plate", 15},
+               {"transport-belt", 5},
+               {"iron-axe",1}
             },
          result_count = 2,
          result = "subterranean-belt",
@@ -20,7 +21,8 @@ data:extend({
          ingredients =
             {
                {"iron-gear-wheel", 20},
-               {"underground-belt", 2}
+               {"underground-belt", 2},
+               {"steel-axe",1}
             },
          result_count = 2,
          result = "fast-subterranean-belt",
@@ -36,6 +38,7 @@ data:extend({
                {"iron-gear-wheel", 40},
                {"fast-underground-belt", 2},
                {type="fluid", name="lubricant", amount=4},
+               {"steel-axe",1}
             },
          result_count = 2,
          result = "express-subterranean-belt"
@@ -46,8 +49,9 @@ data:extend({
          enabled = false,
          ingredients =
             {
-               {"pipe", 10},
-               {"iron-plate", 5}
+               {"pipe", 16},
+               {"iron-plate", 10},
+               {"steel-axe",1}
             },
          result_count = 2,
          result = "subterranean-pipe",

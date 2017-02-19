@@ -14,7 +14,7 @@ data:extend({
             },
          unit =
             {
-               count = 20,
+               count = 50,
                ingredients = {{"science-pack-1", 1}},
                time = 15
             },
@@ -24,7 +24,7 @@ data:extend({
          type = "technology",
          name = "subterranean-logistics-2",
          icon = "__base__/graphics/technology/logistics.png",
-         prerequisites = {"logistics-2"},
+         prerequisites = {"logistics-2", "steel-processing", "subterranean-logistics-1"},
          effects =
             {
                {
@@ -34,9 +34,9 @@ data:extend({
             },
          unit =
             {
-               count = 20,
-               ingredients = {{"science-pack-1", 1}},
-               time = 15
+               count = 80,
+               ingredients = {{"science-pack-2", 1},{"science-pack-1",1}},
+               time = 30
             },
          order = "a-f-a",
       },
@@ -44,7 +44,7 @@ data:extend({
          type = "technology",
          name = "subterranean-logistics-3",
          icon = "__base__/graphics/technology/logistics.png",
-         prerequisites = {"logistics-3"},
+         prerequisites = {"logistics-3","oil-processing","subterranean-logistics-2"},
          effects =
             {
                {
@@ -54,9 +54,9 @@ data:extend({
             },
          unit =
             {
-               count = 20,
-               ingredients = {{"science-pack-1", 1}},
-               time = 15
+               count = 150,
+               ingredients = {{"science-pack-2", 1}, {"science-pack-1",1}},
+               time = 30
             },
          order = "a-f-a",
       },
@@ -64,7 +64,7 @@ data:extend({
          type = "technology",
          name = "subterranean-liquid-logistics",
          icon = "__base__/graphics/technology/landfill.png",
-         prerequisites = {"oil-processing"},
+         prerequisites = {"oil-processing","steel-processing"},
          effects =
             {
                {
@@ -74,9 +74,9 @@ data:extend({
             },
          unit =
             {
-               count = 20,
-               ingredients = {{"science-pack-1", 1}},
-               time = 15
+               count = 170,
+               ingredients = {{"science-pack-3", 1},{"science-pack-2",2}},
+               time = 30
             },
          order = "a-f-a",
       }

@@ -258,6 +258,7 @@ data:extend({
                      filename = "__base__/graphics/entity/pipe-to-ground/pipe-to-ground-up.png",
                      priority = "high",
                      width = 44,
+                     tint = {r=1,g=0.5,b=0.1,a=1},
                      height = 32 --, shift = {0.10, -0.04}
                   },
                down =
@@ -265,6 +266,7 @@ data:extend({
                      filename = "__base__/graphics/entity/pipe-to-ground/pipe-to-ground-down.png",
                      priority = "high",
                      width = 40,
+                     tint = {r=1,g=0.5,b=0.1,a=1},
                      height = 32 --, shift = {0.05, 0}
                   },
                left =
@@ -272,6 +274,7 @@ data:extend({
                      filename = "__base__/graphics/entity/pipe-to-ground/pipe-to-ground-left.png",
                      priority = "high",
                      width = 32,
+                     tint = {r=1,g=0.5,b=0.1,a=1},
                      height = 42 --, shift = {-0.12, 0.1}
                   },
                right =
@@ -279,6 +282,7 @@ data:extend({
                      filename = "__base__/graphics/entity/pipe-to-ground/pipe-to-ground-right.png",
                      priority = "high",
                      width = 32,
+                     tint = {r=1,g=0.5,b=0.1,a=1},
                      height = 40 --, shift = {0.1, 0.1}
                   },
             }

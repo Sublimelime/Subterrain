@@ -48,6 +48,7 @@ data:extend({
                            filename = "__base__/graphics/entity/underground-belt/underground-belt-structure.png",
                            priority = "extra-high",
                            shift = {0.26, 0},
+                           tint = {r=1,g=0.3,b=0.1,a=1},
                            width = 57,
                            height = 43,
                            y = 43
@@ -60,6 +61,7 @@ data:extend({
                            filename = "__base__/graphics/entity/underground-belt/underground-belt-structure.png",
                            priority = "extra-high",
                            shift = {0.26, 0},
+                           tint = {r=1,g=0.3,b=0.1,a=1},
                            width = 57,
                            height = 43
                         }
@@ -114,6 +116,7 @@ data:extend({
                            filename = "__base__/graphics/entity/fast-underground-belt/fast-underground-belt-structure.png",
                            priority = "extra-high",
                            shift = {0.26, 0},
+                           tint = {r=1,g=0.1,b=1,a=1},
                            width = 57,
                            height = 43,
                            y = 43
@@ -126,6 +129,7 @@ data:extend({
                            filename = "__base__/graphics/entity/fast-underground-belt/fast-underground-belt-structure.png",
                            priority = "extra-high",
                            shift = {0.26, 0},
+                           tint = {r=1,g=0.1,b=1,a=1},
                            width = 57,
                            height = 43
                         }
@@ -180,6 +184,7 @@ data:extend({
                            filename = "__base__/graphics/entity/express-underground-belt/express-underground-belt-structure.png",
                            priority = "extra-high",
                            shift = {0.26, 0},
+                           tint = {r=0,g=1,b=1,a=1},
                            width = 57,
                            height = 43,
                            y = 43
@@ -192,6 +197,7 @@ data:extend({
                            filename = "__base__/graphics/entity/express-underground-belt/express-underground-belt-structure.png",
                            priority = "extra-high",
                            shift = {0.26, 0},
+                           tint = {r=0,g=1,b=1,a=1},
                            width = 57,
                            height = 43
                         }

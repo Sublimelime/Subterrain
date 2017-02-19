@@ -127,7 +127,7 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
 
       --first check to see if it's my belt or pipe being removed
       if entity.name=='subterranean-belt' or entity.name=='fast-subterranean-belt' or entity.name=='express-subterranean-belt' then
-         if not SHOULD_REFUND_BELTS or BELT_REFUND_MULTIPLIER <= 0 then --don't do any of this if not refunding belts
+         if not SHOULD_REFUND_BELTS or BELT_REFUND_MULTIPLIER <= 0 then --don't do any of this if not refunding belts, or refund should not be given
             return nil
          end
 
@@ -142,9 +142,10 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
             --distance formula to find out distance
             local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
 
-            if distance == 0 then
+            if distance == 0  or entity.force.name == 'neutral' or inputEntity.force.name == 'neutral' then --it has no pair, aka itself, or a reward was already given
                return nil
             end
+            inputEntity.force = "neutral" -- Set the other belt to neutral, so we don't give the reward twice
             --find and place a chest full of the belts to refund
             local chestPosition = game.surfaces[1].find_non_colliding_position("steel-chest", player.position, 0, 1.5)
             local chestEntity = nil
@@ -176,9 +177,10 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
             --distance formula to find out distance
             local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
 
-            if distance == 0 then --there's no other match for this belt, so refund has already been given/should not be
+            if distance == 0  or entity.force.name == 'neutral' or outputEntity.force.name == 'neutral' then --it has no pair, aka itself, or a reward was already given
                return nil
             end
+            outputEntity.force = "neutral" -- Set the other belt to neutral, so we don't give the reward twice
 
             --find and place a chest full of the belts to refund
             local chestPosition = game.surfaces[1].find_non_colliding_position("steel-chest", player.position, 0, 1.5)
@@ -206,6 +208,7 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
             return nil
          end
 
+
          local player=game.players[e.player_index]
          --get neighbor of belt and figure out distance
          local inputEntity = entity.neighbours[2] or entity --the opening end of the pair of pipes or itself
@@ -216,9 +219,10 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
          --distance formula to find out distance
          local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
 
-         if distance == 0 then --it has no pair, aka itself
+         if distance == 0  or entity.force.name == 'neutral' or inputEntity.force.name == 'neutral' then --it has no pair, aka itself, or a reward was already given
             return nil
          end
+         inputEntity.force = "neutral" -- Set the other pipe to neutral, so we don't give the reward twice
          --find and place a chest full of the pipes to refund
          local chestPosition = game.surfaces[1].find_non_colliding_position("wooden-chest", player.position, 0, 1.5)
          local chestEntity = nil

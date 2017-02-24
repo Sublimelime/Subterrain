@@ -41,10 +41,14 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
             --distance formula to find out distance
             local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
 
+            if inputEntity.force.name == "neutral" then --on place, set the other belt to be refunded again, if it is set to not be refunded
+               inputEntity.force = player.force
+            end
+
             --check if they have the correct amount of the respective belt in their inventory
             ------------------------NORMAL BELT
             if entity.name=='subterranean-belt' then
-               if player.get_item_count("transport-belt") < (distance * BELT_COST_MULTIPLIER) then --if they don't have enough
+               if player.get_item_count("transport-belt") < (math.floor(distance * BELT_COST_MULTIPLIER)) then --if they don't have enough
                   entity.destroy() -- Destroy the entity
                   player.print("Not enough transport belts in inventory to create this length.")
 
@@ -55,12 +59,12 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
                      player.cursor_stack.count = player.cursor_stack.count + 1
                   end
                else --they have enough
-                  player.remove_item{name="transport-belt",count=distance * BELT_COST_MULTIPLIER} --deduct the required belts from their inventory
+                  player.remove_item{name="transport-belt",count=math.floor(distance * BELT_COST_MULTIPLIER)} --deduct the required belts from their inventory
                end
 
                ---------------------FAST BELT
             elseif entity.name == 'fast-subterranean-belt' then
-               if player.get_item_count("fast-transport-belt") < (distance * BELT_COST_MULTIPLIER) then --if they don't have enough
+               if player.get_item_count("fast-transport-belt") < (math.floor(distance * BELT_COST_MULTIPLIER)) then --if they don't have enough
                   entity.destroy() -- Destroy the entity
                   player.print("Not enough fast transport belts in inventory to create this length.")
 
@@ -71,12 +75,12 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
                      player.cursor_stack.count = player.cursor_stack.count + 1
                   end
                else --they have enough
-                  player.remove_item{name="fast-transport-belt",count=distance * BELT_COST_MULTIPLIER} --deduct the required belts from their inventory
+                  player.remove_item{name="fast-transport-belt",count=math.floor(distance * BELT_COST_MULTIPLIER)} --deduct the required belts from their inventory
                end
 
                ------------------EXPRESS BELT
             elseif entity.name == 'express-subterranean-belt' then
-               if player.get_item_count("express-transport-belt") < (distance * BELT_COST_MULTIPLIER)then --if they don't have enough
+               if player.get_item_count("express-transport-belt") < (math.floor(distance * BELT_COST_MULTIPLIER)) then --if they don't have enough
                   entity.destroy() -- Destroy the entity
                   player.print("Not enough express transport belts in inventory to create this length.")
 
@@ -87,7 +91,7 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
                      player.cursor_stack.count = player.cursor_stack.count + 1
                   end
                else --they have enough
-                  player.remove_item{name="express-transport-belt",count=distance * BELT_COST_MULTIPLIER} --deduct the required belts from their inventory
+                  player.remove_item{name="express-transport-belt",count=math.floor(distance * BELT_COST_MULTIPLIER)} --deduct the required belts from their inventory
                end
             end
          end
@@ -105,7 +109,12 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
          --distance formula to find out distance
          local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
 
-         if player.get_item_count("pipe") < (distance * PIPE_COST_MULTIPLIER) then --if they don't have enough
+
+         if inputEntity.force.name == "neutral" then --on place, set the other pipe to be refunded again, if it is set to not be refunded
+            inputEntity.force = player.force
+         end
+
+         if player.get_item_count("pipe") < (math.floor(distance * PIPE_COST_MULTIPLIER)) then --if they don't have enough
             entity.destroy() -- Destroy the entity
             player.print("Not enough pipes in inventory to create this length.")
 
@@ -116,7 +125,7 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
                player.cursor_stack.count = player.cursor_stack.count + 1
             end
          else --they have enough
-            player.remove_item{name="pipe",count=distance * PIPE_COST_MULTIPLIER} --deduct the required belts from their inventory
+            player.remove_item{name="pipe",count=math.floor(distance * PIPE_COST_MULTIPLIER)} --deduct the required belts from their inventory
          end
 
       end --ends the pipe code

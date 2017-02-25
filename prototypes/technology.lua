@@ -3,7 +3,7 @@ data:extend({
       {
          type = "technology",
          name = "subterranean-logistics-1",
-         icon = "__base__/graphics/technology/logistics.png",
+         icon = "__Subterrain__/graphics/technology/logistics.png",
          prerequisites = {"logistics"},
          effects =
             {
@@ -19,11 +19,12 @@ data:extend({
                time = 15
             },
          order = "a-f-a",
+         icon_size = 128
       },
       {
          type = "technology",
          name = "subterranean-logistics-2",
-         icon = "__base__/graphics/technology/logistics.png",
+         icon = "__Subterrain__/graphics/technology/logistics.png",
          prerequisites = {"logistics-2", "steel-processing", "subterranean-logistics-1"},
          effects =
             {
@@ -39,11 +40,12 @@ data:extend({
                time = 30
             },
          order = "a-f-a",
+         icon_size = 128
       },
       {
          type = "technology",
          name = "subterranean-logistics-3",
-         icon = "__base__/graphics/technology/logistics.png",
+         icon = "__Subterrain__/graphics/technology/logistics.png",
          prerequisites = {"logistics-3","oil-processing","subterranean-logistics-2"},
          effects =
             {
@@ -59,11 +61,12 @@ data:extend({
                time = 30
             },
          order = "a-f-a",
+         icon_size = 128
       },
       {
          type = "technology",
          name = "subterranean-liquid-logistics",
-         icon = "__base__/graphics/technology/landfill.png",
+         icon = "__Subterrain__/graphics/technology/liquid-logistics.png",
          prerequisites = {"oil-processing","steel-processing"},
          effects =
             {
@@ -79,5 +82,6 @@ data:extend({
                time = 30
             },
          order = "a-f-a",
+         icon_size = 128
       }
 })

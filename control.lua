@@ -9,9 +9,6 @@ local PIPE_COST_MULTIPLIER = 1 --(DEFAULT (integer, cannot be floating point): 1
 -- Change this to false if you'd like to not get the belts back when you break the pair of belts.
 local SHOULD_REFUND_BELTS = true -- (DEFAULT (boolean): true)
 
--- Change this to false if belts and pipes should not be refunded when the subterranean belt or pipe is destroyed by damage
-local SHOULD_REFUND_IF_DESTROYED = true --(DEFAULT (boolean): true)
-
 -- Change this to false if pipes should not be refunded.
 local SHOULD_REFUND_PIPES = true -- (DEFAULT (boolean): true)
 
@@ -21,301 +18,169 @@ local BELT_REFUND_MULTIPLIER = 1.0 --(DEFAULT (floating point): 1.0)
 -- Change this if you'd like to change what percentage of pipes get returned when breaking the pair of pipe to grounds. For valid numbers, see field above
 local PIPE_REFUND_MULTIPLIER = 1.0 --(DEFAULT (floating point): 1.0)
 
------------------------------
+local sb, fsb, esb = "subterranean-belt", "fast-subterranean-belt", "express-subterranean-belt"
+local tb, ftb, etb =  "transport-belt", "fast-transport-belt", "express-transport-belt"
+local sp, pp = "subterranean-pipe", "pipe"
+
+
+local function getDistance(e, ioEn)
+   local entity = e
+   local ioEntity = ioEn
+
+   return math.sqrt(math.pow(math.abs(math.floor(ioEntity.position.x) - math.floor(entity.position.x)), 2) + math.pow(math.abs(math.floor(ioEntity.position.y) - math.floor(entity.position.y)), 2))
+end
+
+local function checkCount(player, count, what)
+   if player.get_item_count(what) < count then
+      return false
+   else
+      return true
+   end
+
+end
+
+local function setForceToPlayer(ioEntity, player)
+   if ioEntity.force.name == "neutral" then
+      ioEntity.force = player.force
+   end
+end
+
+local function restoreDeniedItem(player,item)
+   if not player.cursor_stack.valid_for_read then --if that was their last one
+      player.cursor_stack.set_stack{name = item, count = 1}
+   elseif player.cursor_stack.name == item then
+      player.cursor_stack.count = player.cursor_stack.count + 1
+   end
+end
 
 
 script.on_event({defines.events.on_built_entity}, --run whenever the player builds an entity
    function(e)
-      local entity=e.created_entity
+      local entity = e.created_entity
 
-      --first check to see if it's my belt or pipe being built
-      if entity.name=='subterranean-belt' or entity.name=='fast-subterranean-belt' or entity.name=='express-subterranean-belt' then
-         if entity.belt_to_ground_type == 'output' then --If they're building the ending piece
-            local player=game.players[e.player_index]
-            --get neighbor of belt and figure out distance
-            local inputEntity = entity.neighbours[1] --the opening end of the pair of belts
-            local IX = inputEntity.position.x
-            local IY = inputEntity.position.y
-            local OX = entity.position.x
-            local OY = entity.position.y
-            --distance formula to find out distance
-            local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
+      if (e.name == sb) or (e.name == fsb) or (e.name == esb) then
+         local player = game.players[e.player_index]
 
-            if inputEntity.force.name == "neutral" then --on place, set the other belt to be refunded again, if it is set to not be refunded
-               inputEntity.force = player.force
-            end
+         if entity.belt_to_ground_type == "output" then
+            local ioEntity = entity.neighbours[1]
+            local distance = getDistance(entity, ioEntity)
+            local calc = (math.floor(distance * BELT_COST_MULTIPLIER))
 
-            --check if they have the correct amount of the respective belt in their inventory
-            ------------------------NORMAL BELT
-            if entity.name=='subterranean-belt' then
-               if player.get_item_count("transport-belt") < (math.floor(distance * BELT_COST_MULTIPLIER)) then --if they don't have enough
-                  entity.destroy() -- Destroy the entity
+            setForceToPlayer(ioEntity, player)
+
+            if  entity.name == sb then ------------------------NORMAL BELT
+               if not checkCount(player, calc, tb) then
+                  entity.destroy()
                   player.print("Not enough transport belts in inventory to create this length.")
 
-                  --give their items back
-                  if not player.cursor_stack.valid_for_read then --if that was their last one
-                     player.cursor_stack.set_stack{name="subterranean-belt", count=1}
-                  elseif player.cursor_stack.name == "subterranean-belt" then
-                     player.cursor_stack.count = player.cursor_stack.count + 1
-                  end
+                  restoreDeniedItem(player,sb)
+
                else --they have enough
-                  player.remove_item{name="transport-belt",count=math.floor(distance * BELT_COST_MULTIPLIER)} --deduct the required belts from their inventory
+                  player.remove_item{name = tb, count = calc} --deduct the required belts from their inventory
                end
 
-               ---------------------FAST BELT
-            elseif entity.name == 'fast-subterranean-belt' then
-               if player.get_item_count("fast-transport-belt") < (math.floor(distance * BELT_COST_MULTIPLIER)) then --if they don't have enough
-                  entity.destroy() -- Destroy the entity
+            elseif entity.name == fsb then ---------------------FAST BELT
+               if not checkCount(player, calc, ftb) then
+                  entity.destroy()
                   player.print("Not enough fast transport belts in inventory to create this length.")
 
-                  --give their items back
-                  if not player.cursor_stack.valid_for_read then --if that was their last one
-                     player.cursor_stack.set_stack{name="fast-subterranean-belt", count=1}
-                  elseif player.cursor_stack.name == "fast-subterranean-belt" then
-                     player.cursor_stack.count = player.cursor_stack.count + 1
-                  end
+                  restoreDeniedItem(player,fsb)
+
                else --they have enough
-                  player.remove_item{name="fast-transport-belt",count=math.floor(distance * BELT_COST_MULTIPLIER)} --deduct the required belts from their inventory
+                  player.remove_item{name = ftb, count = calc} --deduct the required belts from their inventory
                end
 
-               ------------------EXPRESS BELT
-            elseif entity.name == 'express-subterranean-belt' then
-               if player.get_item_count("express-transport-belt") < (math.floor(distance * BELT_COST_MULTIPLIER)) then --if they don't have enough
-                  entity.destroy() -- Destroy the entity
+            elseif entity.name == esb then ------------------EXPRESS BELT
+               if not checkCount(player, calc, etb) then
+                  entity.destroy()
                   player.print("Not enough express transport belts in inventory to create this length.")
 
-                  --give their items back
-                  if not player.cursor_stack.valid_for_read then --if that was their last one
-                     player.cursor_stack.set_stack{name="express-subterranean-belt", count=1}
-                  elseif player.cursor_stack.name == "express-subterranean-belt" then
-                     player.cursor_stack.count = player.cursor_stack.count + 1
-                  end
+                  restoreDeniedItem(player,esb)
+
                else --they have enough
-                  player.remove_item{name="express-transport-belt",count=math.floor(distance * BELT_COST_MULTIPLIER)} --deduct the required belts from their inventory
+                  player.remove_item{name = etb, count = calc} --deduct the required belts from their inventory
                end
             end
          end
-      elseif entity.name=='subterranean-pipe' then
-         local player=game.players[e.player_index]
-         --get neighbor of pipe and figure out distance
-         local inputEntity = entity.neighbours[2] --the opening end of the pair of pipes
-         if not inputEntity then --this will be nil if we're building the first pipe
-            return nil
-         end
-         local IX = inputEntity.position.x
-         local IY = inputEntity.position.y
-         local OX = entity.position.x
-         local OY = entity.position.y
-         --distance formula to find out distance
-         local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
 
+      elseif entity.name == sp then
+         local player = game.players[e.player_index]
+         local ioEntity = entity.neighbours[2]
 
-         if inputEntity.force.name == "neutral" then --on place, set the other pipe to be refunded again, if it is set to not be refunded
-            inputEntity.force = player.force
+         if not ioEntity then
+            return nil --no need to do anything if this is the first placed
          end
 
-         if player.get_item_count("pipe") < (math.floor(distance * PIPE_COST_MULTIPLIER)) then --if they don't have enough
-            entity.destroy() -- Destroy the entity
+         local distance = getDistance(entity, ioEntity)
+         local calc = (math.floor(distance * PIPE_COST_MULTIPLIER))
+
+         setForceToPlayer(ioEntity, player)
+
+         if not checkCount(player, calc, pp) then
+            entity.destroy()
             player.print("Not enough pipes in inventory to create this length.")
 
-            --give their items back
-            if not player.cursor_stack.valid_for_read then --if that was their last one
-               player.cursor_stack.set_stack{name="subterranean-pipe", count=1}
-            elseif player.cursor_stack.name == "subterranean-pipe" then
-               player.cursor_stack.count = player.cursor_stack.count + 1
-            end
-         else --they have enough
-            player.remove_item{name="pipe",count=math.floor(distance * PIPE_COST_MULTIPLIER)} --deduct the required belts from their inventory
-         end
+            restoreDeniedItem(player,sp)
 
-      end --ends the pipe code
-   end --ends the function in the event
+         else
+            player.remove_item{name = pp, count = calc} --charge the player the pipes
+         end
+      end
+   end
 )
 
 script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mined item is removed from the map
    function(e)
-
-      local entity=e.entity
-
-      --first check to see if it's my belt or pipe being removed
-      if entity.name=='subterranean-belt' or entity.name=='fast-subterranean-belt' or entity.name=='express-subterranean-belt' then
-         if not SHOULD_REFUND_BELTS or BELT_REFUND_MULTIPLIER <= 0 then --don't do any of this if not refunding belts, or refund should not be given
-            return nil
-         end
-
-         if entity.belt_to_ground_type == 'output' then --If they're breaking the ending piece
-
-            --get neighbor of belt and figure out distance
-            local inputEntity = entity.neighbours[1] or entity --the opening end of the pair of belts or itself
-            local IX = inputEntity.position.x
-            local IY = inputEntity.position.y
-            local OX = entity.position.x
-            local OY = entity.position.y
-            --distance formula to find out distance
-            local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
-
-            if distance == 0  or entity.force.name == 'neutral' or inputEntity.force.name == 'neutral' then --it has no pair, aka itself, or a reward was already given
-               return nil
-            end
-            inputEntity.force = "neutral" -- Set the other belt to neutral, so we don't give the reward twice
-            --find and place a chest full of the belts to refund
-            local chestPosition = game.surfaces[1].find_non_colliding_position("steel-chest", entity.position, 0, 1.5)
-            local chestEntity = nil
-            if chestPosition then --if found a position for the chest
-               chestEntity = game.surfaces[1].create_entity({name="wooden-chest",position=chestPosition,force="neutral"})
-            end
-
-            if chestEntity then
-
-               --fill the chest with belts corresponding to what the belt pair was made of
-               if entity.name == 'subterranean-belt' then
-                  chestEntity.insert{name="transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
-               elseif entity.name == 'fast-subterranean-belt' then
-                  chestEntity.insert{name="fast-transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
-               elseif entity.name == 'express-subterranean-belt' then
-                  chestEntity.insert{name="express-transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
-               end
-            end
-
-         elseif entity.belt_to_ground_type == 'input' then --they broke the input first
-
-            --get neighbor of belt and figure out distance
-            local outputEntity = entity.neighbours[1] or entity --the opening end of the pair of belts, or itself
-
-            local IX = outputEntity.position.x
-            local IY = outputEntity.position.y
-            local OX = entity.position.x
-            local OY = entity.position.y
-            --distance formula to find out distance
-            local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
-
-            if distance == 0  or entity.force.name == 'neutral' or outputEntity.force.name == 'neutral' then --it has no pair, aka itself, or a reward was already given
-               return nil
-            end
-            outputEntity.force = "neutral" -- Set the other belt to neutral, so we don't give the reward twice
-
-            --find and place a chest full of the belts to refund
-            local chestPosition = game.surfaces[1].find_non_colliding_position("steel-chest", entity.position, 0, 1.5)
-            local chestEntity = nil
-            if chestPosition then --if found a position for the chest
-               chestEntity = game.surfaces[1].create_entity({name="wooden-chest",position=chestPosition,force="neutral"})
-            end
-
-            if chestEntity then
-               --fill the chest with belts corresponding to what the belt pair was made of
-               if entity.name == 'subterranean-belt' then
-                  chestEntity.insert{name="transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
-               elseif entity.name == 'fast-subterranean-belt' then
-                  chestEntity.insert{name="fast-transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
-               elseif entity.name == 'express-subterranean-belt' then
-                  chestEntity.insert{name="express-transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
-               end
-
-            end
-
-         end
-
-      elseif entity.name=='subterranean-pipe' then
-         if not SHOULD_REFUND_PIPES or PIPE_REFUND_MULTIPLIER <= 0 then --don't do any of this if not refunding pipes
-            return nil
-         end
-
-         --get neighbor of pipe and figure out distance
-         local inputEntity = entity.neighbours[2] or entity --the opening end of the pair of pipes or itself
-         local IX = inputEntity.position.x
-         local IY = inputEntity.position.y
-         local OX = entity.position.x
-         local OY = entity.position.y
-         --distance formula to find out distance
-         local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
-
-         if distance == 0  or entity.force.name == 'neutral' or inputEntity.force.name == 'neutral' then --it has no pair, aka itself, or a reward was already given
-            return nil
-         end
-         inputEntity.force = "neutral" -- Set the other pipe to neutral, so we don't give the reward twice
-         --find and place a chest full of the pipes to refund
-         local chestPosition = game.surfaces[1].find_non_colliding_position("wooden-chest", entity.position, 0, 1.5)
-         local chestEntity = nil
-         if chestPosition then --if found a position for the chest
-            chestEntity = game.surfaces[1].create_entity({name="wooden-chest",position=chestPosition,force="neutral"})
-         end
-
-         if chestEntity then
-            --fill the chest with pipes
-            chestEntity.insert{name="pipe",count=math.floor((distance * PIPE_COST_MULTIPLIER) * PIPE_REFUND_MULTIPLIER)}
-         end
-      end
-
-   end
-)
-
-script.on_event({defines.events.on_entity_died}, --runs when an entity dies
-   function(e)
       local entity = e.entity
-      game.print(entity.name)
-      ---------------Pipes
-      if entity.name == 'subterranean-pipe' then
-         if not SHOULD_REFUND_IF_DESTROYED then --don't do this if config is set to deny
+
+      if (e.name == sb) or (e.name == fsb) or (e.name == esb) then
+         --don't do any of this if not refunding belts, or refund should not be given
+         if (not SHOULD_REFUND_BELTS) or (BELT_REFUND_MULTIPLIER <= 0) then
             return nil
          end
 
-         --get neighbor of belt and figure out distance
-         local inputEntity = entity.neighbours[2] or entity --the opening end of the pair of pipes or itself
-         local IX = inputEntity.position.x
-         local IY = inputEntity.position.y
-         local OX = entity.position.x
-         local OY = entity.position.y
-         --distance formula to find out distance
-         local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
+         local player = game.players[e.player_index]
 
-         if distance == 0  or entity.force.name == 'neutral' or inputEntity.force.name == 'neutral' then --it has no pair, aka itself, or a reward was already given
+         local ioEntity = entity.neighbours[1] or entity
+         local distance = getDistance(entity, ioEntity)
+
+         --it has no pair, aka itself, or a reward was already given
+         if (distance == 0)  or (entity.force.name == "neutral") or (ioEntity.force.name == "neutral") then
             return nil
          end
-         inputEntity.force = "neutral" -- Set the other pipe to neutral, so we don't give the reward twice
-         --find and place a chest full of the pipes to refund
-         local chestPosition = game.surfaces[1].find_non_colliding_position("wooden-chest", entity.position, 0, 1.5)
-         local chestEntity = nil
-         if chestPosition then --if found a position for the chest
-            chestEntity = game.surfaces[1].create_entity({name="wooden-chest",position=chestPosition,force="neutral"})
-         end
 
-         if chestEntity then
-            --fill the chest with pipes
-            chestEntity.insert{name="pipe",count=math.floor((distance * PIPE_COST_MULTIPLIER) * PIPE_REFUND_MULTIPLIER)}
-         end
+         ioEntity.force = "neutral"
+         local calc = (math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER))
 
-      elseif entity.name == 'subterranean-belt' or  e.entity.name == 'fast-subterranean-belt' or  e.entity.name == 'express-subterranean-belt' then
-         --get neighbor of pipe and figure out distance
-         local outputEntity = entity.neighbours[1] or entity --the opening end of the pair of belts, or itself
-
-         local IX = outputEntity.position.x
-         local IY = outputEntity.position.y
-         local OX = entity.position.x
-         local OY = entity.position.y
-         --distance formula to find out distance
-         local distance = math.sqrt(math.pow(math.abs(math.floor(IX) - math.floor(OX)),2) + math.pow(math.abs(math.floor(IY) - math.floor(OY)),2))
-
-         if distance == 0  or entity.force.name == 'neutral' or outputEntity.force.name == 'neutral' then --it has no pair, aka itself, or a reward was already given
-            return nil
-         end
-         outputEntity.force = "neutral" -- Set the other belt to neutral, so we don't give the reward twice
-
-         --find and place a chest full of the belts to refund
-         local chestPosition = game.surfaces[1].find_non_colliding_position("steel-chest", entity.position, 0, 1.5)
-         local chestEntity = nil
-         if chestPosition then --if found a position for the chest
-            chestEntity = game.surfaces[1].create_entity({name="wooden-chest",position=chestPosition,force="neutral"})
-         end
-
-         if chestEntity then
-            --fill the chest with belts corresponding to what the belt pair was made of
-            if entity.name == 'subterranean-belt' then
-               chestEntity.insert{name="transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
-            elseif entity.name == 'fast-subterranean-belt' then
-               chestEntity.insert{name="fast-transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
-            elseif entity.name == 'express-subterranean-belt' then
-               chestEntity.insert{name="express-transport-belt",count=math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER)}
+         if player.character then
+            if entity.name == sb then
+               player.insert{name = tb, count = calc}
+            elseif entity.name == fsb then
+               player.insert{name = ftb, count = calc}
+            elseif entity.name == esb then
+               player.insert{name = etb, count = calc}
             end
+         end
+
+      elseif entity.name == sp then
+         local player = game.players[e.player_index]
+
+         if (not SHOULD_REFUND_PIPES) or (PIPE_REFUND_MULTIPLIER <= 0) then --don't do any of this if not refunding pipes
+            return nil
+         end
+
+         local ioEntity = entity.neighbours[2] or entity --the opening end of the pair of pipes or itself
+         local distance = getDistance(entity, ioEntity)
+
+         if (distance == 0)  or (entity.force.name == "neutral") or (ioEntity.force.name == "neutral") then --it has no pair, aka itself, or a reward was already given
+            return nil
+         end
+
+         ioEntity.force = "neutral"
+         local calc = (math.floor((distance * PIPE_COST_MULTIPLIER) * PIPE_REFUND_MULTIPLIER))
+
+         if player.character then
+            player.insert{name = pp, count = calc}
          end
       end
    end

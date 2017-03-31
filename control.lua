@@ -18,15 +18,16 @@ local BELT_REFUND_MULTIPLIER = 1.0 --(DEFAULT (floating point): 1.0)
 -- Change this if you'd like to change what percentage of pipes get returned when breaking the pair of pipe to grounds. For valid numbers, see field above
 local PIPE_REFUND_MULTIPLIER = 1.0 --(DEFAULT (floating point): 1.0)
 
+----End user config
+-------------------
+
+
 local sb, fsb, esb = "subterranean-belt", "fast-subterranean-belt", "express-subterranean-belt"
 local tb, ftb, etb =  "transport-belt", "fast-transport-belt", "express-transport-belt"
 local sp, pp = "subterranean-pipe", "pipe"
 
 
-local function getDistance(e, ioEn)
-   local entity = e
-   local ioEntity = ioEn
-
+local function getDistance(entity, ioEntity)
    return math.sqrt(math.pow(math.abs(math.floor(ioEntity.position.x) - math.floor(entity.position.x)), 2) + math.pow(math.abs(math.floor(ioEntity.position.y) - math.floor(entity.position.y)), 2))
 end
 
@@ -36,7 +37,6 @@ local function checkCount(player, count, what)
    else
       return true
    end
-
 end
 
 local function setForceToPlayer(ioEntity, player)
@@ -56,12 +56,15 @@ end
 
 script.on_event({defines.events.on_built_entity}, --run whenever the player builds an entity
    function(e)
+
       local entity = e.created_entity
 
-      if (e.name == sb) or (e.name == fsb) or (e.name == esb) then
+      if (entity.name == sb) or (entity.name == fsb) or (entity.name == esb) then
+         if BELT_COST_MULTIPLIER <= 0 then return nil end --don't cost belts
          local player = game.players[e.player_index]
 
-         if entity.belt_to_ground_type == "output" then
+         --if this belt is the second one being built
+         if entity.belt_to_ground_type == "output" or (entity.belt_to_ground_type == "input" and entity.neighbours[1]) then
             local ioEntity = entity.neighbours[1]
             local distance = getDistance(entity, ioEntity)
             local calc = (math.floor(distance * BELT_COST_MULTIPLIER))
@@ -71,7 +74,7 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
             if  entity.name == sb then ------------------------NORMAL BELT
                if not checkCount(player, calc, tb) then
                   entity.destroy()
-                  player.print("Not enough transport belts in inventory to create this length.")
+                  player.print("You don't have enough transport belts in your inventory to create this length.")
 
                   restoreDeniedItem(player,sb)
 
@@ -82,7 +85,7 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
             elseif entity.name == fsb then ---------------------FAST BELT
                if not checkCount(player, calc, ftb) then
                   entity.destroy()
-                  player.print("Not enough fast transport belts in inventory to create this length.")
+                  player.print("You don't have enough fast transport belts in your inventory to create this length.")
 
                   restoreDeniedItem(player,fsb)
 
@@ -93,7 +96,7 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
             elseif entity.name == esb then ------------------EXPRESS BELT
                if not checkCount(player, calc, etb) then
                   entity.destroy()
-                  player.print("Not enough express transport belts in inventory to create this length.")
+                  player.print("You don't have enough express transport belts in your inventory to create this length.")
 
                   restoreDeniedItem(player,esb)
 
@@ -104,6 +107,7 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
          end
 
       elseif entity.name == sp then
+         if PIPE_COST_MULTIPLIER <= 0 then return nil end
          local player = game.players[e.player_index]
          local ioEntity = entity.neighbours[2]
 
@@ -118,10 +122,9 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
 
          if not checkCount(player, calc, pp) then
             entity.destroy()
-            player.print("Not enough pipes in inventory to create this length.")
+            player.print("You don't have enough pipes in your inventory to create this length.")
 
             restoreDeniedItem(player,sp)
-
          else
             player.remove_item{name = pp, count = calc} --charge the player the pipes
          end
@@ -133,14 +136,13 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
    function(e)
       local entity = e.entity
 
-      if (e.name == sb) or (e.name == fsb) or (e.name == esb) then
+      if (entity.name == sb) or (entity.name == fsb) or (entity.name == esb) then
          --don't do any of this if not refunding belts, or refund should not be given
          if (not SHOULD_REFUND_BELTS) or (BELT_REFUND_MULTIPLIER <= 0) then
             return nil
          end
 
          local player = game.players[e.player_index]
-
          local ioEntity = entity.neighbours[1] or entity
          local distance = getDistance(entity, ioEntity)
 

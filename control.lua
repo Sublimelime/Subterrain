@@ -107,6 +107,8 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
          end
 
       elseif entity.name == sp then
+         entity.rotatable = false --Prevent rotation, as that can be used to game the system
+
          if PIPE_COST_MULTIPLIER <= 0 then return nil end
          local player = game.players[e.player_index]
          local ioEntity = entity.neighbours[2]

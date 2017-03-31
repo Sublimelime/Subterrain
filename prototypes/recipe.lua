@@ -21,7 +21,7 @@ data:extend({
          ingredients =
             {
                {"iron-gear-wheel", 20},
-               {"underground-belt", 2},
+               {"subterranean-belt", 2},
                {"steel-axe",1}
             },
          result_count = 2,
@@ -36,7 +36,7 @@ data:extend({
          ingredients =
             {
                {"iron-gear-wheel", 40},
-               {"fast-underground-belt", 2},
+               {"fast-subterranean-belt", 2},
                {type="fluid", name="lubricant", amount=4},
                {"steel-axe",1}
             },

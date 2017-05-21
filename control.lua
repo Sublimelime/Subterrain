@@ -1,28 +1,3 @@
--- USER CONFIG VARS ---------
---These variables are now editable through the mod-settings menu.
-
--- Change this if you want the mod to take more belts for the same distance, for balancing
---local BELT_COST_MULTIPLIER = settings.global["subterrain-belt-cost-multiplier"].value --(DEFAULT (integer, cannot be floating point): 1)
-
--- Change this if you want the mod to take more pipe for the same distance, for balancing
---local PIPE_COST_MULTIPLIER = settings.global["subterrain-pipe-cost-multiplier"].value --(DEFAULT (integer, cannot be floating point): 1)
-
--- Change this to false if you'd like to not get the belts back when you break the pair of belts.
---local SHOULD_REFUND_BELTS = settings.global["subterrain-should-refund-belts"].value -- (DEFAULT (boolean): true)
-
--- Change this to false if pipes should not be refunded.
---local SHOULD_REFUND_PIPES = settings.global["subterrain-should-refund-pipes"].value -- (DEFAULT (boolean): true)
-
--- Change this if you'd like to change what percentage of belts get returned when breaking the pair of belts. 0 means no belts, 0.5 means 50% of belts used, 2 for twice the amount used, etc. Overridden if settings.global["subterrain-should-refund-belts"].value is false.
---local BELT_REFUND_MULTIPLIER = settings.global["subterrain-belt-refund-multiplier"].value  --(DEFAULT (floating point): 1.0)
-
--- Change this if you'd like to change what percentage of pipes get returned when breaking the pair of pipe to grounds. For valid numbers, see field above
---local PIPE_REFUND_MULTIPLIER = settings.global["subterrain-pipe-refund-multiplier"].value --(DEFAULT (floating point): 1.0)
-
-----End user config
--------------------
-
-
 local sb, fsb, esb = "subterranean-belt", "fast-subterranean-belt", "express-subterranean-belt"
 local tb, ftb, etb =  "transport-belt", "fast-transport-belt", "express-transport-belt"
 local sp, pp = "subterranean-pipe", "pipe"

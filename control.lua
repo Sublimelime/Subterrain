@@ -1,22 +1,23 @@
 -- USER CONFIG VARS ---------
+--These variables are now editable through the mod-settings menu.
 
 -- Change this if you want the mod to take more belts for the same distance, for balancing
-local BELT_COST_MULTIPLIER = 1 --(DEFAULT (integer, cannot be floating point): 1)
+--local BELT_COST_MULTIPLIER = settings.global["subterrain-belt-cost-multiplier"].value --(DEFAULT (integer, cannot be floating point): 1)
 
 -- Change this if you want the mod to take more pipe for the same distance, for balancing
-local PIPE_COST_MULTIPLIER = 1 --(DEFAULT (integer, cannot be floating point): 1)
+--local PIPE_COST_MULTIPLIER = settings.global["subterrain-pipe-cost-multiplier"].value --(DEFAULT (integer, cannot be floating point): 1)
 
 -- Change this to false if you'd like to not get the belts back when you break the pair of belts.
-local SHOULD_REFUND_BELTS = true -- (DEFAULT (boolean): true)
+--local SHOULD_REFUND_BELTS = settings.global["subterrain-should-refund-belts"].value -- (DEFAULT (boolean): true)
 
 -- Change this to false if pipes should not be refunded.
-local SHOULD_REFUND_PIPES = true -- (DEFAULT (boolean): true)
+--local SHOULD_REFUND_PIPES = settings.global["subterrain-should-refund-pipes"].value -- (DEFAULT (boolean): true)
 
--- Change this if you'd like to change what percentage of belts get returned when breaking the pair of belts. 0 means no belts, 0.5 means 50% of belts used, 2 for twice the amount used, etc. Overridden if SHOULD_REFUND_BELTS is false.
-local BELT_REFUND_MULTIPLIER = 1.0 --(DEFAULT (floating point): 1.0)
+-- Change this if you'd like to change what percentage of belts get returned when breaking the pair of belts. 0 means no belts, 0.5 means 50% of belts used, 2 for twice the amount used, etc. Overridden if settings.global["subterrain-should-refund-belts"].value is false.
+--local BELT_REFUND_MULTIPLIER = settings.global["subterrain-belt-refund-multiplier"].value  --(DEFAULT (floating point): 1.0)
 
 -- Change this if you'd like to change what percentage of pipes get returned when breaking the pair of pipe to grounds. For valid numbers, see field above
-local PIPE_REFUND_MULTIPLIER = 1.0 --(DEFAULT (floating point): 1.0)
+--local PIPE_REFUND_MULTIPLIER = settings.global["subterrain-pipe-refund-multiplier"].value --(DEFAULT (floating point): 1.0)
 
 ----End user config
 -------------------
@@ -60,14 +61,14 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
       local entity = e.created_entity
 
       if (entity.name == sb) or (entity.name == fsb) or (entity.name == esb) then
-         if BELT_COST_MULTIPLIER <= 0 then return nil end --don't cost belts
+         if settings.global["subterrain-belt-cost-multiplier"].value <= 0 then return nil end --don't cost belts
          local player = game.players[e.player_index]
 
          --if this belt is the second one being built
          if entity.belt_to_ground_type == "output" or (entity.belt_to_ground_type == "input" and entity.neighbours[1]) then
             local ioEntity = entity.neighbours[1]
             local distance = getDistance(entity, ioEntity)
-            local calc = (math.floor(distance * BELT_COST_MULTIPLIER))
+            local calc = (math.floor(distance * settings.global["subterrain-belt-cost-multiplier"].value))
 
             setForceToPlayer(ioEntity, player)
 
@@ -109,7 +110,7 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
       elseif entity.name == sp then
          entity.rotatable = false --Prevent rotation, as that can be used to game the system
 
-         if PIPE_COST_MULTIPLIER <= 0 then return nil end
+         if settings.global["subterrain-pipe-cost-multiplier"].value <= 0 then return nil end
          local player = game.players[e.player_index]
          local ioEntity = entity.neighbours[2]
 
@@ -118,7 +119,7 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
          end
 
          local distance = getDistance(entity, ioEntity)
-         local calc = (math.floor(distance * PIPE_COST_MULTIPLIER))
+         local calc = (math.floor(distance * settings.global["subterrain-pipe-cost-multiplier"].value))
 
          setForceToPlayer(ioEntity, player)
 
@@ -140,7 +141,7 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
 
       if (entity.name == sb) or (entity.name == fsb) or (entity.name == esb) then
          --don't do any of this if not refunding belts, or refund should not be given
-         if (not SHOULD_REFUND_BELTS) or (BELT_REFUND_MULTIPLIER <= 0) then
+         if (not settings.global["subterrain-should-refund-belts"].value) or (settings.global["subterrain-belt-refund-multiplier"].value <= 0) then
             return nil
          end
 
@@ -154,7 +155,7 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
          end
 
          ioEntity.force = "neutral"
-         local calc = (math.floor((distance * BELT_COST_MULTIPLIER) * BELT_REFUND_MULTIPLIER))
+         local calc = (math.floor((distance * settings.global["subterrain-belt-cost-multiplier"].value) * settings.global["subterrain-belt-refund-multiplier"].value))
 
          if player.character then
             if entity.name == sb then
@@ -169,7 +170,7 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
       elseif entity.name == sp then
          local player = game.players[e.player_index]
 
-         if (not SHOULD_REFUND_PIPES) or (PIPE_REFUND_MULTIPLIER <= 0) then --don't do any of this if not refunding pipes
+         if (not settings.global["subterrain-should-refund-pipes"].value) or (settings.global["subterrain-pipe-refund-multiplier"].value <= 0) then --don't do any of this if not refunding pipes
             return nil
          end
 
@@ -181,7 +182,7 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
          end
 
          ioEntity.force = "neutral"
-         local calc = (math.floor((distance * PIPE_COST_MULTIPLIER) * PIPE_REFUND_MULTIPLIER))
+         local calc = (math.floor((distance * settings.global["subterrain-pipe-cost-multiplier"].value) * settings.global["subterrain-pipe-refund-multiplier"].value))
 
          if player.character then
             player.insert{name = pp, count = calc}

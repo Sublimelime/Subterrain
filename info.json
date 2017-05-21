@@ -1,11 +1,11 @@
 {
     "name": "Subterrain",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "title": "Subterrain",
     "author": "Gangsir",
-    "contact": "The best way to reach me is to PM me on Reddit, at /u/Gangsir.",
+    "contact": "The best way to reach me is to PM me on Reddit, at /u/Gangsir. It is also possible to contact me by creating an issue on the github page of this project, in the homepage field.",
     "homepage": "https://github.com/TheRealGangsir/Subterrain",
-    "factorio_version": "0.14",
-    "dependencies": ["base >= 0.14"],
+    "factorio_version": "0.15",
+    "dependencies": ["base >= 0.15"],
     "description": "Adds a few tiers of underground belt/pipe that can go much farther than standard underground belts/pipes, and charges the player a number of belts/pipes based on the distance between the entrance and exit belt/pipe."
 }

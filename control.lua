@@ -40,8 +40,8 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
          local player = game.players[e.player_index]
 
          --if this belt is the second one being built
-         if entity.belt_to_ground_type == "output" or (entity.belt_to_ground_type == "input" and entity.neighbours[1]) then
-            local ioEntity = entity.neighbours[1]
+         if entity.belt_to_ground_type == "output" or (entity.belt_to_ground_type == "input" and entity.neighbours) then
+            local ioEntity = entity.neighbours
             local distance = getDistance(entity, ioEntity)
             local calc = (math.floor(distance * settings.global["subterrain-belt-cost-multiplier"].value))
 
@@ -121,7 +121,7 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
          end
 
          local player = game.players[e.player_index]
-         local ioEntity = entity.neighbours[1] or entity
+         local ioEntity = entity.neighbours or entity
          local distance = getDistance(entity, ioEntity)
 
          --it has no pair, aka itself, or a reward was already given

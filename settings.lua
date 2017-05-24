@@ -24,7 +24,7 @@ data:extend({
          type = "bool-setting",
          name = "subterrain-should-refund-pipes",
          setting_type = "runtime-global",
-         default_value = false,
+         default_value = true,
          order = "d",
       },
       {

@@ -71,14 +71,59 @@ end
 function subterrainPipesOnBuilt(event)
     local entity = e.entity
     local player = game.players[e.player_index]
+    entity.rotatable = false --Prevent rotation, as that can be used to game the system
 
+    if settings.global["subterrain-pipe-cost-multiplier"].value <= 0 then return nil end --no pipe cost
+
+    local otherPipe = entity.neighbours[2] or nil
+
+    if not otherPipe then
+        return nil --no need to do anything if this is the first placed
+    end
+
+    local distance = getDistance(entity, otherPipe)
+    local calc = (math.floor(distance * settings.global["subterrain-pipe-cost-multiplier"].value))
+
+    otherPipe.force = "player"
+
+    if not checkCount(player, calc, "pipe") then
+        entity.destroy()
+        player.print("You don't have enough pipes in your inventory to create this length.")
+
+        restoreDeniedItem(player, sp)
+    else
+        player.remove_item{name = "pipe", count = calc} --charge the player the pipes
+    end
 end
 
 
 --actions for bob's logistics on built
 function bobsLogisticsOnBuilt(event)
+    if settings.global["subterrain-belt-cost-multiplier"].value <= 0 then return nil end --don't cost belts
     local entity = e.entity
     local player = game.players[e.player_index]
+
+    --check to see if the place is important
+    if not entity.belt_to_ground_type == "output" or not (entity.belt_to_ground_type == "input" and entity.neighbours) then
+        return
+    end
+
+    local otherEntity = entity.neighbours
+    local distance = getDistance(entity, otherEntity)
+    local cost = (math.floor(distance * settings.global["subterrain-belt-cost-multiplier"].value))
+    local respectiveBelts = string.gsub(entity.name, "underground", "transport")
+    local respectiveBelts_pretty = respectiveBelts:gsub("-", " ") .. "s"
+
+    otherEntity.force = "player" --set the force of the other side to player, to allow refund
+
+    if not checkCount(player, cost, respectiveBelts) then --they don't have enough of the aboveground belts for this distance
+        entity.destroy()
+        player.print("You don't have enough " .. respectiveBelts_pretty ..  " in your inventory to create this length.")
+
+        restoreDeniedItem(player,respectiveBelts)
+    else
+        player.remove_item{name = respectiveBelts, count = cost} --deduct the required belts from their inventory
+    end
 end
 
 

@@ -7,11 +7,9 @@ local function getDistance(entity, ioEntity)
 end
 
 local function checkCount(player, count, what)
-    game.print("Checking for " .. what)
     if player.get_item_count(what) < count then
         return false
     else
-        game.print("The player has enough " .. what)
         return true
     end
 end
@@ -148,7 +146,23 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
 
 --actions for subterrain pipes on mine
 function subterrainOnMinePipes(event)
+    if (not settings.global["subterrain-should-refund-pipes"].value) or (settings.global["subterrain-pipe-refund-multiplier"].value <= 0) then --don't do any of this if not refunding pipes
+        return
+    end
 
+    local otherEntity = entity.neighbours[2] or entity --the opening end of the pair of pipes or itself
+    local distance = getDistance(entity, otherEntity)
+
+    if entity == otherEntity  or (entity.force.name == "neutral") or (otherEntity.force.name == "neutral") then --it has no pair, aka itself, or a reward was already given
+        return
+    end
+
+    otherEntity.force = "neutral"
+    local calc = (math.floor((distance * settings.global["subterrain-pipe-cost-multiplier"].value) * settings.global["subterrain-pipe-refund-multiplier"].value))
+
+    if player.character then
+        player.insert{name = "pipe", count = calc}
+    end
 end
 
 

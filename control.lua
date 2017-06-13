@@ -7,9 +7,11 @@ local function getDistance(entity, ioEntity)
 end
 
 local function checkCount(player, count, what)
+    game.print("Checking for " .. what)
     if player.get_item_count(what) < count then
         return false
     else
+        game.print("The player has enough " .. what)
         return true
     end
 end
@@ -24,13 +26,13 @@ end
 
 
 script.on_event({defines.events.on_built_entity}, --run whenever the player builds an entity
-    function(e)
-        local entity = e.entity
-        local player = game.players[e.player_index]
+    function(event)
+        local entity = event.created_entity
+        local player = game.players[event.player_index]
 
-        if event.name == sb or event.name == fsb or event.name == esb then
+        if entity.name == sb or entity.name == fsb or entity.name == esb then
             subterrainOnBuilt(event)
-        elseif event.name == sp  then
+        elseif entity.name == sp  then
             subterrainPipesOnBuilt(event)
         elseif entity.name == gub or entity.name == pup then
             bobsLogisticsOnBuilt(event)
@@ -41,18 +43,19 @@ script.on_event({defines.events.on_built_entity}, --run whenever the player buil
 -- Actions for subterrain on built.
 function subterrainOnBuilt(event)
     if settings.global["subterrain-belt-cost-multiplier"].value <= 0 then return nil end --don't cost belts
-    local entity = e.entity
-    local player = game.players[e.player_index]
+    local entity = event.created_entity
+    local player = game.players[event.player_index]
+    local eName = entity.name
 
     --check to see if the place is important
-    if not entity.belt_to_ground_type == "output" or not (entity.belt_to_ground_type == "input" and entity.neighbours) then
+    if not entity.belt_to_ground_type == "output" or (entity.belt_to_ground_type == "input" and not entity.neighbours) then
         return
     end
 
     local otherEntity = entity.neighbours
     local distance = getDistance(entity, otherEntity)
     local cost = (math.floor(distance * settings.global["subterrain-belt-cost-multiplier"].value))
-    local respectiveBelts = string.gsub(entity.name, "subterranean", "transport")
+    local respectiveBelts = string.gsub(eName, "subterranean", "transport")
     local respectiveBelts_pretty = respectiveBelts:gsub("-", " ") .. "s"
 
     otherEntity.force = "player" --set the force of the other side to player, to allow refund
@@ -61,7 +64,7 @@ function subterrainOnBuilt(event)
         entity.destroy()
         player.print("You don't have enough " .. respectiveBelts_pretty ..  " in your inventory to create this length.")
 
-        restoreDeniedItem(player,respectiveBelts)
+        restoreDeniedItem(player,eName)
     else
         player.remove_item{name = respectiveBelts, count = cost} --deduct the required belts from their inventory
     end
@@ -69,8 +72,8 @@ end
 
 --actions for subterrain pipes on built
 function subterrainPipesOnBuilt(event)
-    local entity = e.entity
-    local player = game.players[e.player_index]
+    local entity = event.created_entity
+    local player = game.players[event.player_index]
     entity.rotatable = false --Prevent rotation, as that can be used to game the system
 
     if settings.global["subterrain-pipe-cost-multiplier"].value <= 0 then return nil end --no pipe cost
@@ -100,18 +103,19 @@ end
 --actions for bob's logistics on built
 function bobsLogisticsOnBuilt(event)
     if settings.global["subterrain-belt-cost-multiplier"].value <= 0 then return nil end --don't cost belts
-    local entity = e.entity
-    local player = game.players[e.player_index]
+    local entity = event.created_entity
+    local player = game.players[event.player_index]
+    local eName = entity.name
 
     --check to see if the place is important
-    if not entity.belt_to_ground_type == "output" or not (entity.belt_to_ground_type == "input" and entity.neighbours) then
+    if not entity.belt_to_ground_type == "output" or (entity.belt_to_ground_type == "input" and not entity.neighbours) then
         return
     end
 
     local otherEntity = entity.neighbours
     local distance = getDistance(entity, otherEntity)
     local cost = (math.floor(distance * settings.global["subterrain-belt-cost-multiplier"].value))
-    local respectiveBelts = string.gsub(entity.name, "underground", "transport")
+    local respectiveBelts = string.gsub(eName, "underground", "transport")
     local respectiveBelts_pretty = respectiveBelts:gsub("-", " ") .. "s"
 
     otherEntity.force = "player" --set the force of the other side to player, to allow refund
@@ -120,7 +124,7 @@ function bobsLogisticsOnBuilt(event)
         entity.destroy()
         player.print("You don't have enough " .. respectiveBelts_pretty ..  " in your inventory to create this length.")
 
-        restoreDeniedItem(player,respectiveBelts)
+        restoreDeniedItem(player,eName)
     else
         player.remove_item{name = respectiveBelts, count = cost} --deduct the required belts from their inventory
     end

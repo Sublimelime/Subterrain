@@ -140,7 +140,6 @@ script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mi
         elseif entity.name == gub or entity.name == pup then
             bobsLogisticsOnMine(event)
         end
-
     end
 )
 
@@ -149,7 +148,7 @@ function subterrainOnMinePipes(event)
     if (not settings.global["subterrain-should-refund-pipes"].value) or (settings.global["subterrain-pipe-refund-multiplier"].value <= 0) then --don't do any of this if not refunding pipes
         return
     end
-
+    local entity = event.entity
     local otherEntity = entity.neighbours[2] or entity --the opening end of the pair of pipes or itself
     local distance = getDistance(entity, otherEntity)
 
@@ -160,8 +159,8 @@ function subterrainOnMinePipes(event)
     otherEntity.force = "neutral"
     local calc = (math.floor((distance * settings.global["subterrain-pipe-cost-multiplier"].value) * settings.global["subterrain-pipe-refund-multiplier"].value))
 
-    if player.character then
-        player.insert{name = "pipe", count = calc}
+    if game.players[event.player_index].character then
+        game.players[event.player_index].insert{name = "pipe", count = calc}
     end
 end
 

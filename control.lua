@@ -132,7 +132,76 @@ end
 
 
 script.on_event({defines.events.on_preplayer_mined_item}, --Called before the mined item is removed from the map
-    function(e)
+    function(event)
+        local entity = event.entity
+        local player = game.players[event.player_index]
+        if entity.name == sb or entity.name == fsb or entity.name == esb then
+            subterrainOnMine(event)
+        elseif entity.name == sp then
+            subterrainOnMinePipes(event)
+        elseif entity.name == gub or entity.name == pup then
+            bobsLogisticsOnMine(event)
+        end
 
     end
 )
+
+--actions for subterrain pipes on mine
+function subterrainOnMinePipes(event)
+
+end
+
+
+--Actions for subterrain on mine
+function subterrainOnMine(event)
+    if (not settings.global["subterrain-should-refund-belts"].value) or (settings.global["subterrain-belt-refund-multiplier"].value <= 0) then
+        return
+    end
+
+    local entity = event.entity
+    local eName = entity.name
+    local player = game.players[event.player_index]
+    local otherEntity = entity.neighbours or entity
+    local distance = getDistance(entity, otherEntity)
+
+    --it has no pair, aka itself, or a reward was already given
+    if otherEntity == entity  or (entity.force.name == "neutral") or (otherEntity.force.name == "neutral") then
+        return
+    end
+
+    otherEntity.force = "neutral"
+    local calc = (math.floor((distance * settings.global["subterrain-belt-cost-multiplier"].value) * settings.global["subterrain-belt-refund-multiplier"].value))
+    local respectiveBelts = string.gsub(eName, "subterranean", "transport")
+
+
+    if player.character then
+        player.insert{name= respectiveBelts, count = calc}
+    end
+end
+
+
+--Actions for bob's logistics on mine
+function bobsLogisticsOnMine(event)
+    if (not settings.global["subterrain-should-refund-belts"].value) or (settings.global["subterrain-belt-refund-multiplier"].value <= 0) then
+        return
+    end
+
+    local entity = event.entity
+    local eName = entity.name
+    local player = game.players[event.player_index]
+    local otherEntity = entity.neighbours or entity
+    local distance = getDistance(entity, otherEntity)
+
+    --it has no pair, aka itself, or a reward was already given
+    if otherEntity == entity  or (entity.force.name == "neutral") or (otherEntity.force.name == "neutral") then
+        return
+    end
+
+    otherEntity.force = "neutral"
+    local calc = (math.floor((distance * settings.global["subterrain-belt-cost-multiplier"].value) * settings.global["subterrain-belt-refund-multiplier"].value))
+    local respectiveBelts = string.gsub(eName, "underground", "transport")
+
+    if player.character then
+        player.insert{name= respectiveBelts, count = calc}
+    end
+end

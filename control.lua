@@ -158,6 +158,7 @@ function subterrainOnMinePipes(event)
 
 	otherEntity.force = "neutral"
 	local calc = (math.floor((distance * settings.global["subterrain-pipe-cost-multiplier"].value) * settings.global["subterrain-pipe-refund-multiplier"].value))
+	if calc <= 0 then return end -- Exit if the return turns out to be 0.
 
 	if game.players[event.player_index].character then
 		game.players[event.player_index].insert{name = "pipe", count = calc}
@@ -184,6 +185,7 @@ function subterrainOnMine(event)
 
 	otherEntity.force = "neutral"
 	local calc = (math.floor((distance * settings.global["subterrain-belt-cost-multiplier"].value) * settings.global["subterrain-belt-refund-multiplier"].value))
+	if calc <= 0 then return end -- Exit if the return turns out to be 0.
 	local respectiveBelts = string.gsub(eName, "subterranean", "transport")
 
 
@@ -212,6 +214,7 @@ function bobsLogisticsOnMine(event)
 
 	otherEntity.force = "neutral"
 	local calc = (math.floor((distance * settings.global["subterrain-belt-cost-multiplier"].value) * settings.global["subterrain-belt-refund-multiplier"].value))
+	if calc <= 0 then return end -- Exit if the return turns out to be 0.
 	local respectiveBelts = string.gsub(eName, "underground", "transport")
 
 	if player.character then

@@ -1,9 +1,9 @@
 {
     "name": "Subterrain",
-    "version": "0.4.0",
+    "version": "0.4.1",
     "title": "Subterrain",
     "author": "Gangsir",
-    "contact": "The best way to reach me is to PM me on Reddit, at /u/Gangsir. It is also possible to contact me by creating an issue on the bitbucket page of this project, in the homepage field.",
+    "contact": "PM me on Reddit, at /u/Gangsir, or create an issue on the bitbucket page in the homepage field.",
     "homepage": "https://bitbucket.com/Gangsir/subterrain",
     "factorio_version": "0.15",
     "dependencies": ["base >= 0.15", "? boblogistics"],
